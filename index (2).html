@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technology Exam Prep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF2F1;
+    --bg-panel: #FFFFFF;
+    --bg-raised: #E4EBE9;
+    --ink: #142420;
+    --ink-soft: #4B5C57;
+    --line: #C9D4D0;
+    --amber: #C97B3D;
+    --amber-ink: #7A431A;
+    --teal: #2E7D6B;
+    --teal-ink: #1B4A40;
+    --good: #2E7D4F;
+    --good-bg: #E1F3E6;
+    --bad: #B3402F;
+    --bad-bg: #FBE6E1;
+    --radius: 3px;
+    --shadow: 0 1px 0 rgba(20,36,32,.06);
+  }
+  [data-theme="dark"]{
+    --bg: #0D1B2A;
+    --bg-panel: #12263B;
+    --bg-raised: #172E45;
+    --ink: #E8EEEC;
+    --ink-soft: #9FB3C8;
+    --line: #24435F;
+    --amber: #E0A458;
+    --amber-ink: #F3CE9C;
+    --teal: #4FB3A0;
+    --teal-ink: #9BDACB;
+    --good: #6FCB8F;
+    --good-bg: #143324;
+    --bad: #E38070;
+    --bad-bg: #3A1912;
+    --shadow: 0 1px 0 rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', sans-serif;
+    line-height:1.65;
+    transition:background .25s ease, color .25s ease;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  .grid-bg{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity:.35;
+  }
+
+  header{
+    position:sticky; top:0; z-index:50;
+    background:var(--bg-panel);
+    border-bottom:1px solid var(--line);
+    padding:14px 20px;
+  }
+  .header-row{
+    max-width:980px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;border:2px solid var(--amber);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; color:var(--amber);
+    flex-shrink:0;
+  }
+  .brand h1{font-size:17px; margin:0; font-weight:800;}
+  .brand p{margin:0; font-size:12px; color:var(--ink-soft);}
+
+  .controls{display:flex; gap:8px;}
+  .ctrl-btn{
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:8px 14px;
+    border-radius:var(--radius);
+    font-family:'Manrope',sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .ctrl-btn:hover{border-color:var(--amber);}
+  .ctrl-btn:active{transform:scale(.96);}
+
+  main{max-width:980px; margin:0 auto; padding:28px 20px 80px;}
+
+  .mode-toggle{
+    display:flex; border:1px solid var(--line); border-radius:24px; overflow:hidden;
+    width:fit-content; margin:0 auto 26px; background:var(--bg-panel);
+  }
+  .mode-toggle button{
+    padding:10px 26px; border:none; background:transparent; color:var(--ink-soft);
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-toggle button.active{background:var(--teal); color:#fff;}
+
+  .rail{
+    display:flex; align-items:stretch; gap:0; margin-bottom:28px;
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+    background:var(--bg-panel);
+  }
+  .rail-item{
+    flex:1; padding:16px 14px; cursor:pointer; text-align:center;
+    border-left:1px solid var(--line);
+    position:relative;
+    transition:background .15s ease;
+  }
+  .rail-item:first-child{border-left:none;}
+  .rail-item:hover{background:var(--bg-raised);}
+  .rail-item.active{background:var(--bg-raised);}
+  .rail-item.active::after{
+    content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--amber);
+  }
+  .rail-num{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--amber-ink);
+    display:block; margin-bottom:4px; letter-spacing:.05em;
+  }
+  .rail-title{font-size:14px; font-weight:700;}
+
+  .subnav{display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; align-items:center;}
+  .subnav button{
+    background:transparent; border:1px solid var(--line); color:var(--ink-soft);
+    padding:9px 16px; border-radius:20px; font-family:'Manrope',sans-serif; font-size:13.5px;
+    cursor:pointer; transition:all .15s ease;
+  }
+  .subnav button.active{background:var(--teal); border-color:var(--teal); color:#fff; font-weight:700;}
+  .subnav button:hover:not(.active){border-color:var(--teal);}
+  .shuffle-btn{
+    margin-left:auto;
+    background:none; border:1px dashed var(--amber); color:var(--amber-ink);
+    padding:9px 16px; border-radius:20px; font-family:'Manrope',sans-serif; font-size:13px;
+    cursor:pointer;
+  }
+
+  .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;}
+  .score-pill{
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+    background:var(--bg-raised); border:1px solid var(--line); padding:6px 12px; border-radius:20px;
+  }
+  .score-pill b{color:var(--amber-ink);}
+
+  .card{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; margin-bottom:14px; box-shadow:var(--shadow);
+  }
+  .q-index{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--amber-ink);
+    margin-bottom:6px; display:block;
+  }
+  .q-text{font-size:16px; font-weight:700; margin:0 0 14px;}
+
+  .opt{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; margin-bottom:8px;
+    border:1px solid var(--line); border-radius:var(--radius);
+    cursor:pointer; font-size:14.5px;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .opt:hover{border-color:var(--teal);}
+  .opt .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:50%; width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .opt.chosen{border-color:var(--teal); background:var(--bg-raised);}
+  .opt.correct{border-color:var(--good); background:var(--good-bg);}
+  .opt.correct .tag{border-color:var(--good); color:var(--good);}
+  .opt.wrong{border-color:var(--bad); background:var(--bad-bg);}
+  .opt.wrong .tag{border-color:var(--bad); color:var(--bad);}
+  .opt.disabled{cursor:default;}
+
+  .tf-row{display:flex; gap:10px; margin-bottom:14px;}
+  .tf-btn{
+    flex:1; padding:10px; border:1px solid var(--line); border-radius:var(--radius);
+    background:transparent; color:var(--ink); font-family:'Manrope',sans-serif; font-size:14px;
+    cursor:pointer; transition:all .12s ease;
+  }
+  .tf-btn:hover{border-color:var(--teal);}
+  .tf-btn.chosen{border-color:var(--teal); background:var(--bg-raised); font-weight:700;}
+  .tf-btn.correct{border-color:var(--good); background:var(--good-bg); color:var(--good); font-weight:700;}
+  .tf-btn.wrong{border-color:var(--bad); background:var(--bad-bg); color:var(--bad); font-weight:700;}
+
+  .explain{
+    font-size:13.5px; color:var(--ink-soft); border-left:3px solid var(--amber);
+    padding:8px 12px; margin-top:6px; background:var(--bg-raised); border-radius:0 var(--radius) var(--radius) 0;
+    display:none;
+  }
+  .explain.show{display:block;}
+
+  .essay-toggle{
+    background:transparent; border:1px dashed var(--line); color:var(--teal-ink);
+    padding:8px 14px; border-radius:var(--radius); cursor:pointer; font-family:'Manrope',sans-serif; font-size:13.5px;
+  }
+  .essay-ans{
+    display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--line);
+    font-size:14.5px; color:var(--ink-soft);
+  }
+  .essay-ans.show{display:block;}
+
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin:20px 0 6px; flex-wrap:wrap; gap:10px;}
+  .reset-btn{
+    background:none; border:none; color:var(--ink-soft); text-decoration:underline;
+    cursor:pointer; font-family:'Manrope',sans-serif; font-size:13px;
+  }
+
+  footer{
+    text-align:center; color:var(--ink-soft); font-size:12px; padding:20px; border-top:1px solid var(--line);
+  }
+
+  /* Exam mode */
+  .exam-setup{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; text-align:center; margin-bottom:20px;
+  }
+  .exam-setup h2{margin:0 0 8px; font-size:19px;}
+  .exam-setup p{color:var(--ink-soft); font-size:14px; margin:0 0 20px;}
+  .exam-scope{
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:22px;
+  }
+  .exam-scope button{
+    padding:10px 18px; border:1px solid var(--line); border-radius:20px; background:transparent;
+    color:var(--ink); font-family:'Manrope',sans-serif; font-size:13.5px; cursor:pointer;
+  }
+  .exam-scope button.active{background:var(--amber); border-color:var(--amber); color:#fff; font-weight:700;}
+  .start-exam-btn{
+    background:var(--teal); color:#fff; border:none; padding:13px 32px; border-radius:var(--radius);
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:15px; cursor:pointer;
+  }
+  .start-exam-btn:hover{opacity:.92;}
+  .exam-progress{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft); margin-bottom:16px;
+  }
+  .exam-section-label{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal-ink);
+    text-transform:uppercase; letter-spacing:.06em; margin:22px 0 10px;
+    border-top:1px solid var(--line); padding-top:16px;
+  }
+  .exam-section-label:first-child{border-top:none; padding-top:0;}
+  .submit-exam-btn{
+    background:var(--amber); color:#fff; border:none; padding:14px 32px; border-radius:var(--radius);
+    font-family:'Manrope',sans-serif; font-weight:800; font-size:15px; cursor:pointer; display:block; margin:24px auto 0;
+  }
+  .submit-exam-btn:hover{opacity:.92;}
+  .exam-result{
+    text-align:center; background:var(--bg-panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px; margin-bottom:24px;
+  }
+  .exam-result .big-score{font-family:'IBM Plex Mono',monospace; font-size:40px; font-weight:600; color:var(--amber-ink);}
+  .exam-result p{color:var(--ink-soft); font-size:14px;}
+  .retake-btn{
+    background:var(--teal); color:#fff; border:none; padding:11px 24px; border-radius:var(--radius);
+    font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; cursor:pointer; margin-top:10px;
+  }
+
+  @media (max-width:640px){
+    .rail{flex-direction:column;}
+    .rail-item{border-left:none; border-top:1px solid var(--line);}
+    .rail-item:first-child{border-top:none;}
+    .brand h1{font-size:15px;}
+    .shuffle-btn{margin-left:0;}
+  }
+</style>
+</head>
+<body data-theme="light">
+<div class="grid-bg"></div>
+
+<header>
+  <div class="header-row">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div>
+        <h1>Technology Exam Prep</h1>
+        <p>Question bank for all 3 modules</p>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn" id="themeBtn">🌙 Dark</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="mode-toggle" id="modeToggle">
+    <button data-mode="study" class="active">Study</button>
+    <button data-mode="exam">Exam</button>
+  </div>
+
+  <div id="studyView">
+    <div class="rail" id="rail"></div>
+    <div class="subnav" id="subnav"></div>
+    <div class="panel-head">
+      <span id="panelTitle" style="font-weight:700; font-size:15px;"></span>
+      <span class="score-pill mono" id="scorePill" style="display:none;">Score: <b id="scoreVal">0/0</b></span>
+    </div>
+    <div id="content"></div>
+    <div class="toolbar" id="toolbar" style="display:none;">
+      <button class="reset-btn" id="resetBtn">Reset answers ↺</button>
+    </div>
+  </div>
+
+  <div id="examView" style="display:none;"></div>
+</main>
+
+<footer>Randomized question order and answer positions every attempt — memorize the concept, not the pattern.</footer>
+
+<script>
+/* ================= DATA (English only) ================= */
+const DATA = {
+m1:{
+  title:"Module 1", subtitle:"Introduction to Technology",
+  mcq:[
+    {q:'Who defines technology as a "set of means and methods used to achieve a specific objective effectively"?',
+     opts:["Manuel Castells","Jacques Ellul","Johannes Gutenberg","James Watt"],
+     correct:1, exp:"Jacques Ellul is credited with this definition in the text."},
+    {q:"Which writing system did the Sumerians in Mesopotamia develop, according to the text?",
+     opts:["Hieroglyphics","Alphabet","Cuneiform","Printing"],
+     correct:2, exp:"The Sumerians developed cuneiform, one of the earliest known writing systems."},
+    {q:"Which era is described as the turning point from manual labor to machine-based manufacturing?",
+     opts:["The Middle Ages","The Stone Age","The Industrial Revolution","The Digital Age"],
+     correct:2, exp:"The Industrial Revolution shifted production from manual labor to machines."},
+    {q:'What does the acronym "ICT" stand for, as mentioned in the "Information Technology" section?',
+     opts:["Information and Communicating Technology","International Computing Technology","Internal Communicating Technique","Industrial Control Technology"],
+     correct:0, exp:"ICT stands for Information and Communicating Technology."},
+    {q:'"Science" is defined in the text as the study of natural phenomena to reach:',
+     opts:["Practical tools","General laws and theories","Industrial designs","Financial profits"],
+     correct:1, exp:"Science aims to reach general laws and theories that explain natural phenomena."},
+    {q:"Which technology enables remote medical consultations, especially in rural areas?",
+     opts:["3D Printing","Renewable Energy","Telemedicine","Smart Grids"],
+     correct:2, exp:"Telemedicine enables remote medical consultations."},
+    {q:'According to the text, what is the main goal of "Engineering"?',
+     opts:["Understanding the stars","Writing software only","Designing and building structures, machines, and systems","Social media marketing"],
+     correct:2, exp:"Engineering focuses on designing and building structures, machines, and systems."},
+    {q:'"IoT" in smart manufacturing stands for:',
+     opts:["Integrating of Tools","Internet of Things","Industry of Technology","Internal Online Tracking"],
+     correct:1, exp:"IoT stands for Internet of Things."},
+    {q:'Which regulation is mentioned for ensuring the "ethical handling of personal data"?',
+     opts:["ICT","AI","GDPR","5G"],
+     correct:2, exp:"The General Data Protection Regulation (GDPR) is the one mentioned."},
+    {q:"The document mentions that 3D printing is also known as:",
+     opts:["Subtractive manufacturing","Additive manufacturing","Manual manufacturing","Digital photography"],
+     correct:1, exp:"3D printing is called additive manufacturing because it builds objects layer by layer."}
+  ],
+  tf:[
+    {q:"Manuel Castells defines technology as a set of means and methods.",
+     ans:false, fix:"False: it is Jacques Ellul who gives this definition, not Manuel Castells."},
+    {q:"Technology in Ancient Times included the invention of the wheel and basic irrigation systems.",
+     ans:true, fix:""},
+    {q:"Science aims directly at solving practical problems and improving productivity.",
+     ans:false, fix:"False: science aims to reach general laws and theories; applying that practically is technology's role."},
+    {q:"The invention of the printing press by Johannes Gutenberg in the 15th century facilitated the spread of knowledge.",
+     ans:true, fix:""},
+    {q:"Engineering is the study of natural phenomena through observation and experimentation.",
+     ans:false, fix:"False: that describes science; engineering is about designing and building structures, machines, and systems."},
+    {q:"Renewable energy technologies include solar panels and wind turbines.",
+     ans:true, fix:""},
+    {q:"Telemedicine has made healthcare less accessible in rural areas.",
+     ans:false, fix:"False: telemedicine has made healthcare more accessible in rural areas."},
+    {q:"Cybersecurity is essential to protect sensitive data from cyber threats as industries digitize.",
+     ans:true, fix:""},
+    {q:"The Digital Age is characterized by the use of steam power and coal.",
+     ans:false, fix:"False: the Digital Age is characterized by computers and the internet; steam power and coal belong to the Industrial Revolution."},
+    {q:"Smart energy grids utilize AI to balance energy supply and demand.",
+     ans:true, fix:""}
+  ],
+  essay:[
+    {q:"How does the document define the relationship between Science and Technology?",
+     a:"Science seeks to understand natural phenomena and reach general laws and theories, while technology applies that knowledge to create practical tools and solutions; technology is often described as applied science that turns scientific discovery into usable products and systems."},
+    {q:'Mention three major impacts of Technology on "Daily Life" according to the text.',
+     a:"Key impacts include: enabling instant global communication via phones and the internet, improving healthcare access through telemedicine and medical devices, and reshaping work and education through automation and e-learning."},
+    {q:'Explain the role of technology in "Smart Manufacturing" as described in the file.',
+     a:"Technology plays a central role in smart manufacturing by integrating IoT sensors, automation, and data analytics into production lines, allowing machines to communicate and adapt in real time — improving efficiency, reducing waste, and enabling predictive maintenance."},
+    {q:'What are the historical origins of technology mentioned in the "Origins" section?',
+     a:"Technology's roots trace back to primitive stone tools and fire in prehistoric times, then the wheel and irrigation systems in ancient civilizations, the Sumerians' invention of cuneiform writing, and continued development through the Middle Ages up to the beginnings of machine-based manufacturing."},
+    {q:"According to the conclusion, what are the challenges posed by rapid technological evolution?",
+     a:"Challenges include ethical and data-privacy concerns, job displacement due to automation, cybersecurity threats, and a widening digital divide between regions with unequal access to technology."}
+  ]
+},
+m2:{
+  title:"Module 2", subtitle:"Computing, Networks & Cloud",
+  mcq:[
+    {q:'Which component is known as the "brain" of the computer where calculations are performed?',
+     opts:["RAM","Central Processing Unit (CPU)","Hard Drive","Motherboard"],
+     correct:1, exp:"The CPU is the computer's brain, performing calculations."},
+    {q:"The unit within the CPU responsible for logical operations and comparisons is:",
+     opts:["Control Unit (CU)","Arithmetic Logic Unit (ALU)","Register","Cache Memory"],
+     correct:1, exp:"The ALU handles arithmetic, logic operations, and comparisons."},
+    {q:"Which type of memory is volatile and loses its data when the power is turned off?",
+     opts:["Random Access Memory (RAM)","Read-Only Memory (ROM)","Flash Memory","Optical Storage"],
+     correct:0, exp:"RAM is volatile memory and loses its content when power is off."},
+    {q:"Software that manages hardware resources and provides a platform for applications is called:",
+     opts:["Application Software","Operating System (OS)","Utility Software","Programming Software"],
+     correct:1, exp:"The Operating System manages hardware resources and provides a platform for applications."},
+    {q:'In networking, "PAN" stands for:',
+     opts:["Public Area Network","Personal Area Network","Private Access Node","Primary Application Network"],
+     correct:1, exp:"PAN stands for Personal Area Network."},
+    {q:"Which network topology connects all devices to a central hub or switch?",
+     opts:["Bus Topology","Star Topology","Ring Topology","Mesh Topology"],
+     correct:1, exp:"Star topology connects all devices to one central hub."},
+    {q:"The delivery of computing services like storage and processing over the internet is:",
+     opts:["IoT","Hardware Virtualization","Cloud Computing","Networking"],
+     correct:2, exp:"Cloud Computing delivers services like storage and processing over the internet."},
+    {q:"Which cloud service model provides a ready-to-use environment for developing and deploying applications?",
+     opts:["IaaS","PaaS","SaaS","RAM"],
+     correct:1, exp:"PaaS provides a ready-to-use environment for developing and deploying applications."},
+    {q:"The technology that allows physical objects to connect to the internet and exchange data is:",
+     opts:["CPU","Internet of Things (IoT)","Operating System","Firewall"],
+     correct:1, exp:"IoT connects physical objects to the internet to exchange data."},
+    {q:"A security system that monitors and controls incoming and outgoing network traffic is a:",
+     opts:["Router","Switch","Firewall","Modem"],
+     correct:2, exp:"A Firewall monitors and controls network traffic."}
+  ],
+  tf:[
+    {q:"Hard Disk Drives (HDD) are faster and more durable than Solid State Drives (SSD).",
+     ans:false, fix:"False: SSDs are faster and more durable than HDDs."},
+    {q:"The Control Unit (CU) manages the flow of data between various computer components.",
+     ans:true, fix:""},
+    {q:"ROM (Read-Only Memory) is used for temporary data storage while programs are running.",
+     ans:false, fix:"False: RAM is used for temporary storage while running; ROM stores permanent firmware data."},
+    {q:"Application software refers to programs designed to perform specific tasks for users, like Microsoft Word.",
+     ans:true, fix:""},
+    {q:"A Wide Area Network (WAN) typically covers a single building or office.",
+     ans:false, fix:"False: a LAN covers a single building or office; a WAN spans large geographic areas."},
+    {q:"IP Address is a unique numerical label assigned to each device connected to a network.",
+     ans:true, fix:""},
+    {q:"SaaS (Software as a Service) requires users to manage the underlying infrastructure and operating systems.",
+     ans:false, fix:"False: with SaaS the provider manages the infrastructure entirely; users simply use the software."},
+    {q:"Multi-Factor Authentication (MFA) adds an extra layer of security by requiring more than just a password.",
+     ans:true, fix:""},
+    {q:"Encryption makes data easily readable for everyone who accesses it.",
+     ans:false, fix:"False: encryption makes data unreadable without the decryption key."},
+    {q:"Regular software updates and patching are crucial for fixing security vulnerabilities.",
+     ans:true, fix:""}
+  ],
+  essay:[
+    {q:"Compare between Hardware and Software as the two main components of a computer system.",
+     a:"Hardware consists of the physical, tangible components of a computer — CPU, RAM, storage, motherboard — while software is the set of instructions and programs that run on that hardware and direct what tasks it performs; hardware executes, software directs."},
+    {q:"What are the four main types of computer networks based on geographical scope?",
+     a:"Personal Area Network (PAN — a very small range, e.g. Bluetooth), Local Area Network (LAN — a building or office), Metropolitan Area Network (MAN — a city), and Wide Area Network (WAN — spans countries or continents, like the internet)."},
+    {q:"Explain the benefits of Cloud Computing according to the document.",
+     a:"Benefits include cost savings by avoiding physical infrastructure, scalability to adjust resources on demand, accessibility from anywhere with an internet connection, and easier data backup and disaster recovery."},
+    {q:'Describe the function of the "Arithmetic Logic Unit (ALU)" and "Control Unit (CU)" inside the CPU.',
+     a:"The ALU performs arithmetic operations (addition, subtraction) and logical comparisons, while the Control Unit directs and coordinates the CPU's operations and other components — fetching instructions, decoding them, and directing data flow."},
+    {q:'List three "Best Practices" for information security and data protection mentioned in the text.',
+     a:"Use strong, unique passwords with multi-factor authentication; keep software updated and regularly patched; and encrypt sensitive data with regular backups."}
+  ]
+},
+m3:{
+  title:"Module 3", subtitle:"Industrial Revolutions, AI & Biotech",
+  mcq:[
+    {q:"The First Industrial Revolution (1.0) was primarily driven by:",
+     opts:["Electricity","Steam power and mechanization","Electronics and computers","Artificial Intelligence"],
+     correct:1, exp:"The First Industrial Revolution was driven by steam power and mechanization."},
+    {q:'Which Industrial Revolution is known for introducing "Mass Production" and "Assembly Lines"?',
+     opts:["First (1.0)","Second (2.0)","Third (3.0)","Fourth (4.0)"],
+     correct:1, exp:"The Second Industrial Revolution introduced mass production and assembly lines with electricity."},
+    {q:"Industry 4.0 is characterized by the use of:",
+     opts:["Steam engines","Basic electronics","Cyber-physical systems and the Internet of Things (IoT)","Manual assembly lines"],
+     correct:2, exp:"Industry 4.0 relies on cyber-physical systems and IoT."},
+    {q:"Which field of AI focuses on enabling systems to learn from data and improve over time without explicit programming?",
+     opts:["Robotics","Machine Learning","3D Printing","Steam Power"],
+     correct:1, exp:"Machine Learning enables systems to learn from data without explicit programming."},
+    {q:'A "Collaborative Robot" that is designed to work safely alongside humans is called a:',
+     opts:["Industrial Robot","Drone","Cobot","Humanoid"],
+     correct:2, exp:"A Cobot is a collaborative robot designed to work safely alongside humans."},
+    {q:"The use of technology to perform tasks with minimal human intervention is known as:",
+     opts:["Mechanization","Renewable Energy","Telemedicine","Smart Grids"],
+     correct:0, exp:"Mechanization refers to performing tasks with minimal human intervention."},
+    {q:"3D printing is also referred to as:",
+     opts:["Subtractive manufacturing","Additive manufacturing","Manual sculpting","Traditional forging"],
+     correct:1, exp:"3D printing is additive manufacturing."},
+    {q:'"Bio-printing" in biotechnology is used to create:',
+     opts:["Car parts",'Living tissues and organs using "bio-inks"',"Electronic circuits","Plastic toys"],
+     correct:1, exp:"Bio-printing creates living tissues and organs using bio-inks."},
+    {q:"One major challenge in Biotechnology mentioned in the text is:",
+     opts:["Addressing ethical considerations","Using steam power","Creating assembly lines","Improving 19th-century machinery"],
+     correct:0, exp:"Addressing ethical considerations is a major biotechnology challenge."},
+    {q:"The convergence of 3D printing and biotechnology aims to revolutionize:",
+     opts:["The coal industry","Regenerative medicine and personalized drugs","Manual farming techniques","Steam engine design"],
+     correct:1, exp:"This convergence targets regenerative medicine and personalized drugs."}
+  ],
+  tf:[
+    {q:"The Third Industrial Revolution (3.0) began in the 18th century.",
+     ans:false, fix:"False: the Third Industrial Revolution began in the mid-20th century with electronics and computers; the 18th century marked the First Industrial Revolution."},
+    {q:"Artificial Intelligence (AI) aims to create systems capable of performing tasks that typically require human intelligence.",
+     ans:true, fix:""},
+    {q:"Machine Learning requires explicit programming for every specific task.",
+     ans:false, fix:"False: Machine Learning learns from data and improves without needing explicit programming for each task."},
+    {q:"Industrial automation helps in reducing human error and increasing production speed.",
+     ans:true, fix:""},
+    {q:'"Cobots" are designed to replace humans entirely in factories and work in isolation.',
+     ans:false, fix:"False: Cobots are designed to work safely alongside humans, not to replace them or work in isolation."},
+    {q:"3D printing builds objects layer by layer based on a digital 3D model.",
+     ans:true, fix:""},
+    {q:'Traditional manufacturing is an "additive" process.',
+     ans:false, fix:'False: traditional manufacturing is a "subtractive" process (material is removed); 3D printing is the additive process.'},
+    {q:"Biotechnology involves using living systems and organisms to develop or make products.",
+     ans:true, fix:""},
+    {q:"3D printing technology is only used for making simple plastic prototypes.",
+     ans:false, fix:"False: it is used in many applications including medicine, biological organs, spare parts, and more — not just plastic prototypes."},
+    {q:"One future opportunity of 3D printing is growing replacement organs to end waiting lists.",
+     ans:true, fix:""}
+  ],
+  essay:[
+    {q:"Briefly describe the progression of the four Industrial Revolutions as shown in the timeline.",
+     a:"The First (1.0) was built on steam power and mechanization (late 18th century); the Second (2.0) brought electricity, mass production, and assembly lines (late 19th–early 20th century); the Third (3.0) introduced electronics, computers, and automation (mid-20th century); and the Fourth (4.0) is defined by cyber-physical systems, IoT, and AI (21st century)."},
+    {q:"What are the main benefits of applying Artificial Intelligence in the industrial sector?",
+     a:"Increased efficiency and productivity through automation, predictive maintenance that reduces downtime, improved quality control via data analysis, and better decision-making from large-scale data insights."},
+    {q:'How does "Additive Manufacturing" (3D Printing) differ from "Subtractive Manufacturing"?',
+     a:"Additive manufacturing builds objects layer by layer from a digital model, adding material only where needed and minimizing waste; subtractive manufacturing starts with a solid block and removes material to shape the final product, typically producing more waste."},
+    {q:'Explain the importance of "Regenerative Medicine" in the context of 3D printing and Biotechnology.',
+     a:"Combining 3D printing with biotechnology enables bio-printing of living tissues and organs, offering solutions for organ shortages, reducing transplant waiting lists, and enabling personalized treatments matched to a patient's own biology."},
+    {q:"What are the challenges associated with the convergence of 3D printing and biotechnology?",
+     a:"Challenges include ethical considerations around creating living tissue, high costs and technical complexity, regulatory and safety approval hurdles, and ensuring long-term biological compatibility and functionality of printed organs."}
+  ]
+}
+};
+
+/* ================= HELPERS ================= */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+const LETTERS = ['A','B','C','D'];
+
+/* ================= STATE ================= */
+let state = {
+  theme: 'light',
+  mode: 'study',
+  module: 'm1',
+  section: 'mcq',
+  answers: {},       // key -> chosen ORIGINAL index/bool
+  qOrder: {},         // `${mod}_${sec}` -> [originalIdx,...] shuffled
+  optOrder: {}         // `${mod}_mcq_${idx}` -> [originalOptIdx,...] shuffled
+};
+
+function ensureQOrder(mod, sec){
+  const key = `${mod}_${sec}`;
+  if(!state.qOrder[key]){
+    const n = DATA[mod][sec].length;
+    state.qOrder[key] = shuffle([...Array(n).keys()]);
+  }
+  return state.qOrder[key];
+}
+function ensureOptOrder(mod, idx){
+  const key = `${mod}_mcq_${idx}`;
+  if(!state.optOrder[key]){
+    state.optOrder[key] = shuffle([0,1,2,3]);
+  }
+  return state.optOrder[key];
+}
+function reshuffleSection(mod, sec){
+  const key = `${mod}_${sec}`;
+  const n = DATA[mod][sec].length;
+  state.qOrder[key] = shuffle([...Array(n).keys()]);
+  if(sec==='mcq'){
+    DATA[mod].mcq.forEach((_,idx)=>{
+      state.optOrder[`${mod}_mcq_${idx}`] = shuffle([0,1,2,3]);
+    });
+  }
+  // clear answers for this section
+  Object.keys(state.answers).forEach(k=>{
+    if(k.startsWith(`${mod}_${sec}_`)) delete state.answers[k];
+  });
+}
+
+/* ================= STUDY RENDER ================= */
+function renderRail(){
+  const rail = document.getElementById('rail');
+  rail.innerHTML = '';
+  ['m1','m2','m3'].forEach((key,i)=>{
+    const d = DATA[key];
+    const div = document.createElement('div');
+    div.className = 'rail-item' + (state.module===key ? ' active':'');
+    div.innerHTML = `<span class="rail-num mono">0${i+1}</span><span class="rail-title">${d.title} · ${d.subtitle}</span>`;
+    div.onclick = ()=>{ state.module=key; state.section='mcq'; renderStudy(); };
+    rail.appendChild(div);
+  });
+}
+
+function renderSubnav(){
+  const nav = document.getElementById('subnav');
+  nav.innerHTML = '';
+  const labels = {mcq:'Multiple Choice', tf:'True / False', essay:'Essay Questions'};
+  ['mcq','tf','essay'].forEach(sec=>{
+    const btn = document.createElement('button');
+    btn.className = state.section===sec ? 'active':'';
+    btn.textContent = labels[sec];
+    btn.onclick = ()=>{ state.section=sec; renderStudy(); };
+    nav.appendChild(btn);
+  });
+  if(state.section!=='essay'){
+    const shuf = document.createElement('button');
+    shuf.className='shuffle-btn';
+    shuf.textContent='🔀 Shuffle again';
+    shuf.onclick = ()=>{ reshuffleSection(state.module, state.section); renderStudy(); };
+    nav.appendChild(shuf);
+  }
+}
+
+function scoreFor(mod, sec){
+  const list = DATA[mod][sec];
+  let answered=0, correct=0;
+  list.forEach((item,idx)=>{
+    const key = `${mod}_${sec}_${idx}`;
+    if(state.answers[key] !== undefined){
+      answered++;
+      if(sec==='mcq' && state.answers[key]===item.correct) correct++;
+      if(sec==='tf' && state.answers[key]===item.ans) correct++;
+    }
+  });
+  return {answered, correct, total:list.length};
+}
+
+function renderContent(){
+  const mod = state.module, sec = state.section;
+  const content = document.getElementById('content');
+  const panelTitle = document.getElementById('panelTitle');
+  const scorePill = document.getElementById('scorePill');
+  const scoreVal = document.getElementById('scoreVal');
+  const toolbar = document.getElementById('toolbar');
+  const labels = {mcq:'Multiple Choice', tf:'True / False', essay:'Essay Questions'};
+  panelTitle.textContent = `${DATA[mod].title} — ${labels[sec]}`;
+  content.innerHTML = '';
+
+  if(sec==='essay'){
+    scorePill.style.display='none';
+    toolbar.style.display='none';
+    const order = ensureQOrder(mod, sec);
+    order.forEach((idx, pos)=>{
+      const item = DATA[mod].essay[idx];
+      const card = document.createElement('div');
+      card.className='card';
+      const ansId = `essay_${mod}_${idx}`;
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${item.q}</p>
+        <button class="essay-toggle" data-target="${ansId}">Show model answer ▾</button>
+        <div class="essay-ans" id="${ansId}">${item.a}</div>
+      `;
+      content.appendChild(card);
+    });
+    content.querySelectorAll('.essay-toggle').forEach(btn=>{
+      btn.onclick = ()=>{
+        const el = document.getElementById(btn.dataset.target);
+        const showing = el.classList.toggle('show');
+        btn.textContent = showing ? 'Hide answer ▴' : 'Show model answer ▾';
+      };
+    });
+    return;
+  }
+
+  toolbar.style.display='flex';
+  scorePill.style.display='inline-block';
+  const sc = scoreFor(mod, sec);
+  scoreVal.textContent = `${sc.correct}/${sc.answered} (of ${sc.total})`;
+
+  const order = ensureQOrder(mod, sec);
+
+  if(sec==='mcq'){
+    order.forEach((idx, pos)=>{
+      const item = DATA[mod].mcq[idx];
+      const key = `${mod}_mcq_${idx}`;
+      const chosen = state.answers[key];
+      const optOrder = ensureOptOrder(mod, idx);
+      const card = document.createElement('div');
+      card.className='card';
+      let optsHtml = optOrder.map((origOi, pos2)=>{
+        let cls='opt';
+        if(chosen!==undefined){
+          cls+=' disabled';
+          if(origOi===item.correct) cls+=' correct';
+          else if(origOi===chosen) cls+=' wrong';
+        }
+        return `<div class="${cls}" data-oi="${origOi}"><span class="tag mono">${LETTERS[pos2]}</span><span>${item.opts[origOi]}</span></div>`;
+      }).join('');
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${item.q}</p>
+        ${optsHtml}
+        <div class="explain ${chosen!==undefined?'show':''}">${item.exp}</div>
+      `;
+      if(chosen===undefined){
+        card.querySelectorAll('.opt').forEach(optEl=>{
+          optEl.onclick = ()=>{
+            state.answers[key] = parseInt(optEl.dataset.oi);
+            renderContent();
+          };
+        });
+      }
+      content.appendChild(card);
+    });
+  }
+
+  if(sec==='tf'){
+    order.forEach((idx, pos)=>{
+      const item = DATA[mod].tf[idx];
+      const key = `${mod}_tf_${idx}`;
+      const chosen = state.answers[key];
+      const card = document.createElement('div');
+      card.className='card';
+      const trueCls = chosen!==undefined ? (item.ans===true ? 'correct' : (chosen===true ? 'wrong' : '')) : '';
+      const falseCls = chosen!==undefined ? (item.ans===false ? 'correct' : (chosen===false ? 'wrong' : '')) : '';
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${item.q}</p>
+        <div class="tf-row">
+          <button class="tf-btn ${trueCls}" data-val="true" ${chosen!==undefined?'disabled':''}>✔ True</button>
+          <button class="tf-btn ${falseCls}" data-val="false" ${chosen!==undefined?'disabled':''}>✘ False</button>
+        </div>
+        <div class="explain ${(chosen!==undefined && item.fix) ? 'show':''}">${item.fix}</div>
+      `;
+      if(chosen===undefined){
+        card.querySelectorAll('.tf-btn').forEach(btn=>{
+          btn.onclick = ()=>{
+            state.answers[key] = (btn.dataset.val==='true');
+            renderContent();
+          };
+        });
+      }
+      content.appendChild(card);
+    });
+  }
+}
+
+function renderStudy(){
+  renderRail();
+  renderSubnav();
+  renderContent();
+}
+
+/* ================= EXAM MODE ================= */
+let exam = {
+  scope: 'all',      // 'all' | 'm1' | 'm2' | 'm3'
+  questions: [],       // [{mod, sec, idx, optOrder?}]
+  answers: {},         // examKey -> chosen
+  submitted: false
+};
+
+function examKey(item){ return `${item.mod}_${item.sec}_${item.idx}`; }
+
+function buildExam(scope){
+  exam.scope = scope;
+  exam.answers = {};
+  exam.submitted = false;
+  const mods = scope==='all' ? ['m1','m2','m3'] : [scope];
+  let items = [];
+  mods.forEach(mod=>{
+    DATA[mod].mcq.forEach((_,idx)=> items.push({mod, sec:'mcq', idx}));
+    DATA[mod].tf.forEach((_,idx)=> items.push({mod, sec:'tf', idx}));
+  });
+  items = shuffle(items);
+  items.forEach(it=>{
+    if(it.sec==='mcq') it.optOrder = shuffle([0,1,2,3]);
+  });
+  exam.questions = items;
+  // essays included separately, shuffled, for self-review
+  let essayItems = [];
+  mods.forEach(mod=>{
+    DATA[mod].essay.forEach((_,idx)=> essayItems.push({mod, idx}));
+  });
+  exam.essayQuestions = shuffle(essayItems);
+}
+
+function renderExamSetup(){
+  const view = document.getElementById('examView');
+  view.innerHTML = `
+    <div class="exam-setup">
+      <h2>Ready to test yourself?</h2>
+      <p>Pick a scope. Questions and answer order are freshly shuffled every time — no memorizing positions.</p>
+      <div class="exam-scope" id="examScope">
+        <button data-scope="all" class="active">All Modules</button>
+        <button data-scope="m1">Module 1</button>
+        <button data-scope="m2">Module 2</button>
+        <button data-scope="m3">Module 3</button>
+      </div>
+      <button class="start-exam-btn" id="startExamBtn">Start Exam</button>
+    </div>
+  `;
+  let chosenScope = 'all';
+  view.querySelectorAll('#examScope button').forEach(btn=>{
+    btn.onclick = ()=>{
+      view.querySelectorAll('#examScope button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      chosenScope = btn.dataset.scope;
+    };
+  });
+  document.getElementById('startExamBtn').onclick = ()=>{
+    buildExam(chosenScope);
+    renderExamRun();
+  };
+}
+
+function renderExamRun(){
+  const view = document.getElementById('examView');
+  view.innerHTML = '';
+
+  if(!exam.submitted){
+    const progress = document.createElement('div');
+    const answeredCount = Object.keys(exam.answers).length;
+    progress.className='exam-progress';
+    progress.textContent = `${answeredCount} / ${exam.questions.length} answered`;
+    view.appendChild(progress);
+  } else {
+    let correct = 0;
+    exam.questions.forEach(item=>{
+      const key = examKey(item);
+      const chosen = exam.answers[key];
+      const data = DATA[item.mod][item.sec][item.idx];
+      const right = item.sec==='mcq' ? data.correct : data.ans;
+      if(chosen===right) correct++;
+    });
+    const total = exam.questions.length;
+    const pct = total ? Math.round((correct/total)*100) : 0;
+    const resultDiv = document.createElement('div');
+    resultDiv.className='exam-result';
+    resultDiv.innerHTML = `
+      <div class="big-score mono">${correct}/${total}</div>
+      <p>${pct}% correct — review the breakdown below.</p>
+      <button class="retake-btn" id="retakeBtn">Take another exam</button>
+    `;
+    view.appendChild(resultDiv);
+    resultDiv.querySelector('#retakeBtn').onclick = renderExamSetup;
+  }
+
+  let lastLabel = '';
+  exam.questions.forEach((item,pos)=>{
+    const label = `${DATA[item.mod].title} — ${item.sec==='mcq'?'Multiple Choice':'True / False'}`;
+    if(label !== lastLabel){
+      const lab = document.createElement('div');
+      lab.className='exam-section-label';
+      lab.textContent = label;
+      view.appendChild(lab);
+      lastLabel = label;
+    }
+    const data = DATA[item.mod][item.sec][item.idx];
+    const key = examKey(item);
+    const chosen = exam.answers[key];
+    const card = document.createElement('div');
+    card.className='card';
+
+    if(item.sec==='mcq'){
+      const right = data.correct;
+      let optsHtml = item.optOrder.map((origOi,pos2)=>{
+        let cls='opt';
+        if(exam.submitted){
+          cls+=' disabled';
+          if(origOi===right) cls+=' correct';
+          else if(origOi===chosen) cls+=' wrong';
+        } else if(origOi===chosen){
+          cls+=' chosen';
+        }
+        return `<div class="${cls}" data-oi="${origOi}"><span class="tag mono">${LETTERS[pos2]}</span><span>${data.opts[origOi]}</span></div>`;
+      }).join('');
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${data.q}</p>
+        ${optsHtml}
+        <div class="explain ${exam.submitted?'show':''}">${data.exp}</div>
+      `;
+      if(!exam.submitted){
+        card.querySelectorAll('.opt').forEach(optEl=>{
+          optEl.onclick = ()=>{
+            exam.answers[key] = parseInt(optEl.dataset.oi);
+            renderExamRun();
+          };
+        });
+      }
+    } else {
+      const right = data.ans;
+      const trueCls = exam.submitted ? (right===true?'correct':(chosen===true?'wrong':'')) : (chosen===true?'chosen':'');
+      const falseCls = exam.submitted ? (right===false?'correct':(chosen===false?'wrong':'')) : (chosen===false?'chosen':'');
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${data.q}</p>
+        <div class="tf-row">
+          <button class="tf-btn ${trueCls}" data-val="true" ${exam.submitted?'disabled':''}>✔ True</button>
+          <button class="tf-btn ${falseCls}" data-val="false" ${exam.submitted?'disabled':''}>✘ False</button>
+        </div>
+        <div class="explain ${(exam.submitted && data.fix) ? 'show':''}">${data.fix}</div>
+      `;
+      if(!exam.submitted){
+        card.querySelectorAll('.tf-btn').forEach(btn=>{
+          btn.onclick = ()=>{
+            exam.answers[key] = (btn.dataset.val==='true');
+            renderExamRun();
+          };
+        });
+      }
+    }
+    view.appendChild(card);
+  });
+
+  // Essay section
+  if(exam.essayQuestions && exam.essayQuestions.length){
+    const lab = document.createElement('div');
+    lab.className='exam-section-label';
+    lab.textContent = 'Essay Questions (self-review)';
+    view.appendChild(lab);
+    exam.essayQuestions.forEach((eitem,pos)=>{
+      const data = DATA[eitem.mod].essay[eitem.idx];
+      const card = document.createElement('div');
+      card.className='card';
+      const ansId = `examessay_${eitem.mod}_${eitem.idx}`;
+      card.innerHTML = `
+        <span class="q-index mono">Question ${pos+1}</span>
+        <p class="q-text">${data.q}</p>
+        ${exam.submitted ? `<button class="essay-toggle" data-target="${ansId}">Show model answer ▾</button><div class="essay-ans" id="${ansId}">${data.a}</div>` : `<p style="color:var(--ink-soft); font-size:13.5px;">Model answer unlocks after you submit the exam.</p>`}
+      `;
+      view.appendChild(card);
+    });
+    if(exam.submitted){
+      view.querySelectorAll('.essay-toggle').forEach(btn=>{
+        btn.onclick = ()=>{
+          const el = document.getElementById(btn.dataset.target);
+          const showing = el.classList.toggle('show');
+          btn.textContent = showing ? 'Hide answer ▴' : 'Show model answer ▾';
+        };
+      });
+    }
+  }
+
+  if(!exam.submitted){
+    const submitBtn = document.createElement('button');
+    submitBtn.className='submit-exam-btn';
+    submitBtn.textContent='Submit Exam';
+    submitBtn.onclick = ()=>{ exam.submitted = true; renderExamRun(); window.scrollTo({top:0, behavior:'smooth'}); };
+    view.appendChild(submitBtn);
+  }
+}
+
+/* ================= MODE SWITCH ================= */
+document.querySelectorAll('#modeToggle button').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('#modeToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.mode = btn.dataset.mode;
+    document.getElementById('studyView').style.display = state.mode==='study' ? 'block':'none';
+    document.getElementById('examView').style.display = state.mode==='exam' ? 'block':'none';
+    if(state.mode==='exam') renderExamSetup();
+  };
+});
+
+/* ================= EVENTS ================= */
+document.getElementById('themeBtn').onclick = ()=>{
+  state.theme = state.theme==='light' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', state.theme);
+  document.getElementById('themeBtn').textContent = state.theme==='light' ? '🌙 Dark' : '☀️ Light';
+};
+document.getElementById('resetBtn').onclick = ()=>{
+  reshuffleSection(state.module, state.section);
+  renderStudy();
+};
+
+renderStudy();
+</script>
+</body>
+</html>
